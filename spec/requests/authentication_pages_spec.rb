@@ -19,6 +19,12 @@ describe "Authentication" do
       it { should have_title('Sign In') }
       it { should have_error_message('Invalid') }
 
+      it { should_not have_link('Users',      href: users_path) }
+      it { should_not have_link('Profile') }
+      it { should_not have_link('Settings') }
+      it { should_not have_link('Sign Out',   href: signout_path) }
+      it { should have_link('Sign In',        href: signin_path) }
+
       describe "after visiting another page" do
         before { click_link "Home" }
         it { should_not have_selector('div.alert.alert-error') }
@@ -102,7 +108,7 @@ describe "Authentication" do
 
     describe "as non-admin user" do
       let(:user) { FactoryGirl.create(:user) }
-      let(:non_admin) { FactoryGirl.create(user) }
+      let(:non_admin) { FactoryGirl.create(:user) }
 
       before { sign_in non_admin, no_capybara: true }
 
@@ -110,6 +116,11 @@ describe "Authentication" do
         before { delete user_path(user) }
         specify { expect(response).to redirect_to(root_path) }
       end
+    end
+
+    describe "as admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+      before { sign_in admin }
     end
   end
 end
